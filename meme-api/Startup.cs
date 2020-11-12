@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
+using MemeApi.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,7 +29,15 @@ namespace meme_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddDbContextPool<ApplicationDbContext>(options =>
+            {
+                options.UseMySql(
+                    Configuration.GetConnectionString("DbConnectionString"),
+                    new MySqlServerVersion("5.7"),
+                    builder => builder.EnableRetryOnFailure()
+                    );
+            });
+            
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
